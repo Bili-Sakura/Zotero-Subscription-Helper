@@ -51,6 +51,59 @@ Once you're done working, you can deactivate the virtual environment:
 deactivate
 ```
 
+## Usage
+
+### Option 1: Using a YAML Configuration File
+
+You can provide a configuration file in YAML format to specify the conference name, year, and other settings.
+
+1. Create a YAML configuration file (e.g., `config/config.yaml`):
+
+   ```yaml
+   conference: ICCV
+   year: 2023
+   max_papers: 5000  # Optional, defaults to 5000 if not provided
+   ```
+
+2. Run the script with the configuration file:
+
+   ```bash
+   python main.py --config config/config.yaml
+   ```
+
+### Option 2: Using Command-Line Arguments
+
+Alternatively, you can provide the necessary information directly through command-line arguments.
+
+#### Required Arguments
+
+- `--conference`: The name of the conference (e.g., ICCV, CVPR).
+- `--year`: The year of the conference.
+
+#### Optional Arguments
+
+- `--max-papers`: The maximum number of papers to scrape. Default is 5000.
+- `--config`: Path to a YAML configuration file. If provided, this overrides command-line arguments.
+
+#### Example Command
+
+```bash
+python main.py --conference ICCV --year 2023 --max-papers 100
+```
+
+### Notes
+
+- If both a configuration file and command-line arguments are provided, the configuration file will take precedence.
+- Ensure that the output directory (`out/`) is writable and has enough space to store the `.bib` and `.xml` files.
+
 ## Acknowledge
 
-This project is strongly inspired by the work done in the [CPR-RSS](https://github.com/CPR-RSS/CPR-RSS.github.io) repository. We would like to express our gratitude to the contributors of CPR-RSS for their efforts in creating and sharing their work. Their project provided a valuable reference and foundation for the development of this project, [Zotero-Subscription-Helper](https://github.com/Bili-Sakura/Zotero-Subscription-Helper).
+This project is strongly inspired by the work of [CPR-RSS](https://github.com/CPR-RSS/CPR-RSS.github.io) repository [@XgDuan](https://github.com/XgDuan).
+
+## Future Work
+
+### Fix
+
+- [ ] restart from existing file and skip existing items and continue
+- [ ] fix `.xml` format for rss to zotero
+- [ ] use multiprocess to accelerate
