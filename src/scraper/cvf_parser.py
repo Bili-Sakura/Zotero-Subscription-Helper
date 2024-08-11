@@ -23,7 +23,8 @@ class CVFParser(BaseScraper):
         if conference.upper() == "ICCV":
             assert year % 2 == 1, "ICCV is held in odd years only!"
 
-        self.base_url = f"http://openaccess.thecvf.com/{conference.upper()}{year}"
+        self.conference = conference.upper()
+        self.base_url = f"http://openaccess.thecvf.com/{self.conference}{year}"
         self.website_url = "http://openaccess.thecvf.com/"
         super().__init__(self.base_url)
 
@@ -43,42 +44,57 @@ class CVFParser(BaseScraper):
             return []
 
         _content = response.content.decode("utf-8")
-        found_urls = [
-            self.website_url + dda.get("href")
-            for dda in BeautifulSoup(_content, features="html.parser").select("dd >a")
-        ]
-        contents = [
-            requests.get(url, timeout=5).content.decode("utf-8")  # 5 seconds timeout
-            for url in found_urls
-        ]
-
+        soup = BeautifulSoup(_content, features="html.parser")
         paper_list = []
         parse_log = defaultdict(lambda: 0)
 
-        if "all" in [found_url.lower() for found_url in found_urls]:
-            found_urls = found_urls[:-1]
-            contents = contents[:-1]
-
-        logger.info("Found the following containers:")
-        for url, content in zip(found_urls, contents):
-            soup = BeautifulSoup(content, features="html.parser")
-            lists, log = self.parse(soup, url)  # Call to parse method
+        # Check if the conference is WACV, which has a single URL without day categories
+        if self.conference == "WACV":
+            logger.info(
+                "Detected WACV conference, scraping directly from the main page"
+            )
+            lists, log = self.parse(soup, base_url)
             paper_list.extend(lists)
             parse_log = {key: parse_log[key] + log[key] for key in log}
 
-            # Stop if we've reached the maximum number of papers
-            if len(paper_list) >= max_papers:
-                paper_list = paper_list[:max_papers]
-                break
+        else:
+            # Extract all the URLs for different days (non-WACV conferences)
+            found_urls = [
+                self.website_url + dda.get("href") for dda in soup.select("dd >a")
+            ]
+            contents = [
+                requests.get(url, timeout=5).content.decode(
+                    "utf-8"
+                )  # 5 seconds timeout
+                for url in found_urls
+            ]
+
+            if "all" in [found_url.lower() for found_url in found_urls]:
+                found_urls = found_urls[:-1]
+                contents = contents[:-1]
+
+            logger.info("Found the following containers:")
+            for url, content in zip(found_urls, contents):
+                if "all" not in url.lower():
+                    continue
+                soup = BeautifulSoup(content, features="html.parser")
+                lists, log = self.parse(soup, url)
+                paper_list.extend(lists)
+                parse_log = {key: parse_log[key] + log[key] for key in log}
+
+                # Stop if we've reached the maximum number of papers
+                if len(paper_list) >= max_papers:
+                    paper_list = paper_list[:max_papers]
+                    break
 
         # Process and save papers in batches
         for i in tqdm(range(0, len(paper_list), batch_size), desc="Processing batches"):
             batch = paper_list[i : i + batch_size]
             self.process_and_save_batch(batch, filename_base)
 
-        # logger.info(
-        #     f"{self.base_url}, Overall: {parse_log['overall']}, failed: {parse_log['failed']}"
-        # )
+        logger.info(
+            f"{self.base_url}, Overall: {parse_log['overall']}, failed: {parse_log['failed']}"
+        )
 
     def parse(self, html_soup, url=None):
         """
@@ -144,7 +160,6 @@ class CVFParser(BaseScraper):
             try:
                 with open(filename, "a", encoding="utf-8") as file:
                     file.write(content)
-                # logger.info(f"Successfully wrote to {filename}")
             except Exception as e:
                 logger.error(f"Failed to write to {filename}: {e}")
         else:
@@ -205,7 +220,6 @@ class CVFParser(BaseScraper):
                     logger.error(f"All {retries} attempts failed for {paper_info[0]}")
                     return Paper(
                         title=paper_info[0],
-                        # abstract=str(e),
                         abstract=None,
                         pdf_url=self.website_url + paper_info[1],
                         supp_url=None,
@@ -224,7 +238,6 @@ class CVFParser(BaseScraper):
         text = text.replace("'", "&apos;")
         text = text.replace('"', "&quot;")
         text = text.replace("’", "'")
-        # re.sub(u"[\x01-\x1f|\x22|\x26|\x27|\x2f|\x3c|\x3e]+",u"",sourceString)
         text = re.sub("[^!-~]+", " ", text).strip()
 
         return text.strip()

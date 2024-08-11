@@ -2,12 +2,36 @@
 
 This project is designed to crawl paper metadata from computer science conference websites and convert it into `.xml` and `.bib` files for Zotero import.
 
+> [!INFO]
+>
+> Currently, we only support IEEE conference/jounral. We would add more in the future.
+
+> [!WARNING]
+> Due to the unknown restricted format for Zotero RSS, the current `.xml` file can not import properly. Use `.bib` instead. We are going to pay efforts to fix this issue.
+
 ## Features
 
 - Web scraping of conference websites for paper metadata
 - Conversion of scraped data into Zotero-compatible formats (`.xml` and `.bib`)
 
-## Installation
+[CVF Open Access (thecvf.com)](https://openaccess.thecvf.com/menu)
+
+| Conference Name | RSS Link(.xml) [not work often, you may fix the format of these file] | Bibtex Link(.bib)                               |
+| --------------- | ------------------------------------------------------------ | ----------------------------------------------- |
+| CVPR 2024       | <https://bili-sakura.github.io/rss/CVPR2024.xml>               | <https://bili-sakura.github.io/bib/CVPR2024.bib>  |
+| WACV 2024       | <https://bili-sakura.github.io/rss/WACV2024.xml>               | <https://bili-sakura.github.io/bib/WACV2024.bib>  |
+| ICCV 2023       | <https://bili-sakura.github.io/rss/ICCV2023.xml>               | <https://bili-sakura.github.io/bib/iICCV2023.bib> |
+| CVPR 2023       | <https://bili-sakura.github.io/rss/CVPR2023.xml>               | <https://bili-sakura.github.io/bib/CVPR2023.bib>  |
+| WACV 2023       | <https://bili-sakura.github.io/rss/CVPR2023.xml>               | <https://bili-sakura.github.io/bib/WACV2023.bib>  |
+
+For journal, the official provide RSS subscription link, you can access them from their main page, here we provide several heating RSS subscription link.
+
+| Jounral Name                                                 | Official RSS Link                         |
+| ------------------------------------------------------------ | ----------------------------------------- |
+| [TPAMI](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=34) | <https://ieeexplore.ieee.org/rss/TOC34.XML> |
+| [TGRS](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=36) | <https://ieeexplore.ieee.org/rss/TOC36.XML> |
+
+## Installation (only if you are going to generate your own file)
 
 To get started with this project, follow the steps below to set up your development environment.
 
@@ -88,7 +112,7 @@ Alternatively, you can provide the necessary information directly through comman
 #### Example Command
 
 ```bash
-python main.py --conference ICCV --year 2023 --max-papers 100
+python main.py --conference ICCV --year 2023 --max-papers 5000
 ```
 
 ### Notes
