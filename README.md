@@ -2,8 +2,7 @@
 
 This project is designed to crawl paper metadata from computer science conference websites and convert it into `.xml` and `.bib` files for Zotero import.
 
-> [!INFO]
->
+> [!NOTE]
 > Currently, we only support IEEE conference/jounral. We would add more in the future.
 
 > [!WARNING]
