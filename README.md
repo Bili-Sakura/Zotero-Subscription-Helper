@@ -19,7 +19,7 @@ This project is designed to crawl paper metadata from computer science conferenc
 | --------------- | ------------------------------------------------------------ | ----------------------------------------------- |
 | CVPR 2024       | <https://bili-sakura.github.io/rss/CVPR2024.xml>               | <https://bili-sakura.github.io/bib/CVPR2024.bib>  |
 | WACV 2024       | <https://bili-sakura.github.io/rss/WACV2024.xml>               | <https://bili-sakura.github.io/bib/WACV2024.bib>  |
-| ICCV 2023       | <https://bili-sakura.github.io/rss/ICCV2023.xml>               | <https://bili-sakura.github.io/bib/iICCV2023.bib> |
+| ICCV 2023       | <https://bili-sakura.github.io/rss/ICCV2023.xml>               | <https://bili-sakura.github.io/bib/ICCV2023.bib> |
 | CVPR 2023       | <https://bili-sakura.github.io/rss/CVPR2023.xml>               | <https://bili-sakura.github.io/bib/CVPR2023.bib>  |
 | WACV 2023       | <https://bili-sakura.github.io/rss/CVPR2023.xml>               | <https://bili-sakura.github.io/bib/WACV2023.bib>  |
 
