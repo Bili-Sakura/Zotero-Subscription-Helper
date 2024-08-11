@@ -12,26 +12,48 @@ def load_config(config_path="config/config.yaml"):
         return yaml.safe_load(file)
 
 
-def initialize_file(filename_base):
+def initialize_file(filename_base, conference_title):
     """
     Create the files initially to ensure they exist before writing.
     """
     try:
         open(f"out/{filename_base}.bib", "w", encoding="utf-8").close()
-        # init .xml with
-        # <?xml version="1.0" encoding="UTF-8"?>
-        # <rss version="2.0">
-        # <channel>
-        #     <title>ICCV 2023 test</title>
-        # end with
-        # </channel>
-        # </rss>
-        open(f"out/{filename_base}.xml", "w", encoding="utf-8").close()
-        logger.info(f"Initialized {filename_base}.bib and {filename_base}.xml")
+
+        # Initialize the .xml file with the required structure
+        with open(f"out/{filename_base}.xml", "w", encoding="utf-8") as xml_file:
+            xml_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            xml_file.write('<rss version="2.0">\n')
+            xml_file.write("<channel>\n")
+            xml_file.write(f"    <title><![CDATA[{conference_title}]]></title>\n")
+            xml_file.write(
+                f"    <link><![CDATA[http://openaccess.thecvf.com]]></link>\n"
+            )
+            # xml_file.write(
+            #     f"    <description><![CDATA[{conference_title}]]></description>\n"
+            # )
+            # xml_file.write(
+            #     f'    <pubDate>{time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())}</pubDate>\n'
+            # )
+            # xml_file.write(
+            #     f'    <lastBuildDate>{time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())}</lastBuildDate>\n'
+            # )
     except Exception as e:
         logger.error(
             f"Failed to initialize files {filename_base}.bib and {filename_base}.xml: {e}"
         )
+
+
+def finalize_xml(filename_base):
+    """
+    Finalize the XML file by closing the <channel> and <rss> tags.
+    """
+    try:
+        with open(f"out/{filename_base}.xml", "a", encoding="utf-8") as xml_file:
+            xml_file.write("</channel>\n")
+            xml_file.write("</rss>\n")
+        logger.info(f"Finalized {filename_base}.xml")
+    except Exception as e:
+        logger.error(f"Failed to finalize {filename_base}.xml: {e}")
 
 
 def parse_arguments():
@@ -69,6 +91,7 @@ def main():
     # Prepare the filename base using the conference name and year
     conference = config["conference"].upper()
     year = config["year"]
+    conference_title = f"{conference} {year} Papers"
 
     # Ensure the output directory exists
     output_dir = "out"
@@ -82,11 +105,14 @@ def main():
     # Create output files for storing the results
     filename_base = f"{conference}{year}"
     logger.info(f"Filename base: {filename_base}")
-    initialize_file(filename_base)
+    initialize_file(filename_base, conference_title)
 
     # Start scraping and processing
     max_papers = args.max_papers if not args.config else config.get("max_papers", 5000)
     scraper.scrape(filename_base, max_papers=max_papers)
+
+    # Finalize the XML file
+    finalize_xml(filename_base)
 
     logger.info("All papers have been processed and saved.")
 
